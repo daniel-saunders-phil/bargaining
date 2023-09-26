@@ -9,19 +9,19 @@ from scipy import stats
 
 def import_bayaka():
     '''import the bayaka data set, drop necessary columns, relabel columns,
-    convert camps names into indices, z-score all the relational wealth information
+    convert camps names into indices, z-score all the social capital information
     by camp'''
     
     file = "data_couples_Rfile.csv"
 
     data = pd.read_csv(file)
-    bad_columns = ['sex','wealthratio','HH','Unnamed: 21','ageratio','restm','restfem','socializem',
-                   'socializefem','leisurem','leisurefem','wealthfem','wealthm','sticksratio','Couple']
+    bad_columns = ['sex','capitalratio','HH','Unnamed: 21','ageratio','restm','restfem','socializem',
+                   'socializefem','leisurem','leisurefem','capitalfem','capitalm','sticksratio','Couple']
 
     data = data.drop(columns=bad_columns)
     
-    data = data.rename(columns={'sticksm':'male_relational',
-                               "sticksfem":"female_relational"})
+    data = data.rename(columns={'sticksm':'male_social',
+                               "sticksfem":"female_social"})
     
     # convert camp names to numbers
 
@@ -39,20 +39,20 @@ def import_bayaka():
 
     # find z-score of differences
 
-    male_z_relational = np.array([])
-    female_z_relational = np.array([])
+    male_z_social = np.array([])
+    female_z_social = np.array([])
 
     for i in range(3):
         camp_1 = data[data.camp == i]
-        all_sticks = np.concatenate((camp_1.male_relational.values,camp_1.female_relational.values))
+        all_sticks = np.concatenate((camp_1.male_social.values,camp_1.female_social.values))
         z_sticks = (all_sticks - np.mean(all_sticks)) / np.std(all_sticks)
-        camp_male_z_relational = z_sticks[:len(camp_1)]
-        camp_female_z_relational = z_sticks[len(camp_1):]
-        male_z_relational = np.concatenate((male_z_relational,camp_male_z_relational))
-        female_z_relational = np.concatenate((female_z_relational,camp_female_z_relational))
+        camp_male_z_social = z_sticks[:len(camp_1)]
+        camp_female_z_social = z_sticks[len(camp_1):]
+        male_z_social = np.concatenate((male_z_social,camp_male_z_social))
+        female_z_social = np.concatenate((female_z_social,camp_female_z_social))
 
-    data['male_z_relational'] = male_z_relational
-    data['female_z_relational'] = female_z_relational
+    data['male_z_social'] = male_z_social
+    data['female_z_social'] = female_z_social
 
     return data
 
@@ -63,17 +63,17 @@ def import_agta():
 
     data = pd.read_csv(file)
 
-    bad_columns = ['sex','wealthratio','wealthdiff','hh','agediff','leisurem','leisurefem','leisurediff_count',
+    bad_columns = ['sex','capitalratio','capitaldiff','hh','agediff','leisurem','leisurefem','leisurediff_count',
                    'leisurediff_count.1','Unnamed: 22','leisurediff','Apropm','Apropfem','Gift.Z.m','Gift.Z.fem',
                    'num.shown_m','num.shown_fem','A_countm','A_countfem','prop.shared.diff',
-                   'wealthm','wealthfem','num.live.with.m','num.live.with.fem','camp.N.m','camp.N.fem',
+                   'capitalm','capitalfem','num.live.with.m','num.live.with.fem','camp.N.m','camp.N.fem',
                    'prop.live.with.m','prop.live.with.fem','prop.live.with.diff','prop.live.with.ratio',
                    'Live.With.Z.m','Live.With.Z.fem',
                    'ageratio','leisureratio','prop.shared.ratio']
     
     data = data.rename(columns={
-                               "prop.sharedm":"male_relational",
-                               "prop.sharedfem":"female_relational",
+                               "prop.sharedm":"male_social",
+                               "prop.sharedfem":"female_social",
                                "leisurem_count":'leisurem_counts',
                                "leisurefem_count":"leisuref_counts"
     })
@@ -90,27 +90,27 @@ def import_agta():
 
     # find z-score of differences
 
-    male_z_relational = np.array([])
-    female_z_relational = np.array([])
+    male_z_social = np.array([])
+    female_z_social = np.array([])
 
     for i in range(10):
         
         if i == 8:
             
-            male_z_relational = np.concatenate((male_z_relational,np.zeros(4)))
-            female_z_relational = np.concatenate((female_z_relational,np.zeros(4)))
+            male_z_social = np.concatenate((male_z_social,np.zeros(4)))
+            female_z_social = np.concatenate((female_z_social,np.zeros(4)))
             
         else:
             camp_i = data[data.camp == i]
-            all_tokens = np.concatenate((camp_i.male_relational.values,camp_i.female_relational.values))
+            all_tokens = np.concatenate((camp_i.male_social.values,camp_i.female_social.values))
             z_tokens = (all_tokens - np.mean(all_tokens)) / np.std(all_tokens)
-            camp_male_z_relational = z_tokens[:len(camp_i)]
-            camp_female_z_relational = z_tokens[len(camp_i):]
-            male_z_relational = np.concatenate((male_z_relational,camp_male_z_relational))
-            female_z_relational = np.concatenate((female_z_relational,camp_female_z_relational))
+            camp_male_z_social = z_tokens[:len(camp_i)]
+            camp_female_z_social = z_tokens[len(camp_i):]
+            male_z_social = np.concatenate((male_z_social,camp_male_z_social))
+            female_z_social = np.concatenate((female_z_social,camp_female_z_social))
 
-    data['male_z_relational'] = male_z_relational
-    data['female_z_relational'] = female_z_relational
+    data['male_z_social'] = male_z_social
+    data['female_z_social'] = female_z_social
 
     return data
 
@@ -211,7 +211,7 @@ def darwin_dynamics(p,q,p_table,q_table):
 
 
 def dynamic_solve(p_dp,q_dp,budget):
-    '''main function to coordinate all the approve. Returns
+    '''main function to coordinate all the above. Returns
     a predicted division of the resource, given
     disagreement points for each player and the budget'''
 
@@ -303,8 +303,8 @@ def synthetic_data(population_size=50,mean_sticks=3,a=0,b=0,noise=0):
     
     data = [make_data_row(m_stick_dist,f_stick_dist,a,b,noise) for i in range(half_pop_size)]
 
-    data = pd.DataFrame(data,columns=['male_relational',
-                                      'female_relational',
+    data = pd.DataFrame(data,columns=['male_social',
+                                      'female_social',
                                       'leisurem_counts',
                                       'leisuref_counts',
                                        'budget'],index=range(half_pop_size))
@@ -313,14 +313,14 @@ def synthetic_data(population_size=50,mean_sticks=3,a=0,b=0,noise=0):
     
     data = data.dropna(axis='index',how='any')
     
-    all_sticks = np.concatenate((data.male_relational.values,data.female_relational.values))
+    all_sticks = np.concatenate((data.male_social.values,data.female_social.values))
     z_sticks = (all_sticks - np.mean(all_sticks)) / np.std(all_sticks)
-    male_z_relational = z_sticks[:len(data)]
-    female_z_relational = z_sticks[len(data):]
+    male_z_social = z_sticks[:len(data)]
+    female_z_social = z_sticks[len(data):]
     
-    data['male_z_relational'] = male_z_relational
-    data['female_z_relational'] = female_z_relational
-    data['difference_in_z_score'] = male_z_relational - female_z_relational
+    data['male_z_social'] = male_z_social
+    data['female_z_social'] = female_z_social
+    data['difference_in_z_score'] = male_z_social - female_z_social
     
     return data
 
@@ -334,8 +334,8 @@ def objective(a,b,data):
         
         # extract variables from dataset for individual i
         
-        ms = data.male_z_relational.values[i]
-        fs = data.female_z_relational.values[i]
+        ms = data.male_z_social.values[i]
+        fs = data.female_z_social.values[i]
         budg = data.budget.values[i]
         observed_male = data.leisurem_counts.values[i]
 
@@ -381,8 +381,8 @@ def objective_overdispersion(a,b,d,data):
 
     for i in range(len(data)):
 
-        ms = data.male_z_relational.values[i]
-        fs = data.female_z_relational.values[i]
+        ms = data.male_z_social.values[i]
+        fs = data.female_z_social.values[i]
         budg = data.budget.values[i]
         observed_male = data.leisurem_counts.values[i]
 

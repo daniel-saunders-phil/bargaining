@@ -6,6 +6,8 @@ import seaborn as sns
 import time
 from scipy import stats
 
+from bargaining_utility_functions import dynamic_solve
+
 def analyze_grid(mle):
     
     a_grid = mle.index.values
@@ -96,10 +98,10 @@ def estimated_leisure_distribution(data,a,b):
     dp_female = []
 
     for i in range(len(data)):
-        # ms = data.male_relational.values[i]
-        # fs = data.female_relational.values[i]
-        ms = data.male_z_relational.values[i]
-        fs = data.female_z_relational.values[i]
+        # ms = data.male_social.values[i]
+        # fs = data.female_social.values[i]
+        ms = data.male_z_social.values[i]
+        fs = data.female_z_social.values[i]
         budg = data.budget.values[i]
 
         # guess the disagreement points
